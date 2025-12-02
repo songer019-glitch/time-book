@@ -3,47 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conference Agenda - Hong Kong</title>
+    <title>Workshop Agenda</title>
+    
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; background: #f2f2f7; padding: 20px; max-width: 600px; margin: 0 auto; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
+        :root {
+            /* === 🎨 配色中心 === */
+            
+            /* 1. 网页背景色 (您指定的蓝色) */
+            --page-bg-color: #2356DD; 
+
+            /* 2. 强调色 (用于复选框和文字高亮) */
+            --primary-color: #2356DD; 
+
+            /* 3. 卡片样式 */
+            --card-bg: #ffffff;
+            --text-main: #1d1d1f;          
+            --text-sub: #86868b;           
+        }
+
+        /* --- 核心样式 --- */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; 
+            background-color: var(--page-bg-color);
+            color: #ffffff; /* 全局文字变白，适应深色背景 */
+            padding: 20px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding-bottom: 120px; 
+            -webkit-tap-highlight-color: transparent; 
+        }
         
-        /* 页面主要内容容器 */
-        #main-content { transition: opacity 0.3s; }
+        #main-content { display: none; opacity: 0; transition: opacity 0.5s; }
         
-        h1 { text-align: center; color: #1d1d1f; font-size: 22px; margin-bottom: 5px; font-weight: 700; }
-        .subtitle { text-align: center; color: #86868b; font-size: 14px; margin-bottom: 25px; margin-top: 5px; }
+        /* 顶部排版区域 */
+        .header-area { text-align: center; margin-bottom: 25px; }
         
-        .card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; align-items: flex-start; transition: all 0.2s ease; border: 1px solid rgba(0,0,0,0); }
-        .card:active { transform: scale(0.98); background: #fcfcfc; }
-        .card.selected { border: 1px solid #007AFF; background: #f0f7ff; }
+        /* 1. 顶部 Tencent 大字 */
+        .brand-title { 
+            font-size: 24px; 
+            font-weight: 800; 
+            opacity: 0.9; 
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        /* 2. 会议主标题 */
+        h1 { 
+            font-size: 26px; 
+            margin: 10px 0; 
+            font-weight: 700; 
+            line-height: 1.3;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* 日期 */
+        .subtitle { 
+            color: rgba(255,255,255, 0.85); 
+            font-size: 15px; 
+            margin-top: 5px; 
+            font-weight: 500; 
+        }
+
+        /* 3. 新增的小字引导语 */
+        .instruction-text {
+            text-align: left;
+            font-size: 13px;
+            color: rgba(255,255,255, 0.7);
+            margin: 25px 0 10px 5px;
+            font-weight: 400;
+        }
+        
+        /* 卡片样式 */
+        .card { background: var(--card-bg); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; align-items: flex-start; transition: all 0.2s ease; border: 1px solid rgba(0,0,0,0); }
+        .card:active { transform: scale(0.98); opacity: 0.9; }
+        .card.selected { border: 2px solid var(--primary-color); background: #f0f5ff; }
 
         .checkbox-wrapper { margin-right: 16px; padding-top: 4px; display: flex; align-items: center; }
-        .checkbox-wrapper input { width: 22px; height: 22px; accent-color: #007AFF; cursor: pointer; }
+        .checkbox-wrapper input { width: 22px; height: 22px; accent-color: var(--primary-color); cursor: pointer; }
         
-        .info { flex: 1; }
-        .time-tag { color: #007AFF; font-weight: 600; font-size: 13px; display: inline-block; background: rgba(0,122,255,0.1); padding: 2px 8px; border-radius: 6px; margin-bottom: 6px; }
-        .info h3 { margin: 0 0 4px 0; font-size: 16px; color: #1d1d1f; line-height: 1.4; font-weight: 600; }
-        .speaker { color: #1d1d1f; font-weight: 500; font-size: 14px; margin: 4px 0 2px 0; }
-        .affiliation { color: #86868b; font-size: 12px; line-height: 1.3; }
+        .info { flex: 1; color: var(--text-main); }
+        .time-tag { color: var(--primary-color); font-weight: 700; font-size: 13px; display: inline-block; background: rgba(35, 86, 221, 0.1); padding: 3px 8px; border-radius: 6px; margin-bottom: 6px; }
+        .info h3 { margin: 0 0 4px 0; font-size: 16px; color: var(--text-main); line-height: 1.4; font-weight: 700; }
+        .speaker { color: #333; font-weight: 500; font-size: 14px; margin: 4px 0 2px 0; }
+        .affiliation { color: var(--text-sub); font-size: 12px; line-height: 1.3; }
 
+        /* 按钮区域 - 特别优化为白色按钮 */
         .btn-container { position: fixed; bottom: 30px; left: 0; right: 0; display: flex; justify-content: center; z-index: 100; pointer-events: none; flex-direction: column; align-items: center;}
-        #generateBtn { pointer-events: auto; background-color: #007AFF; color: white; border: none; padding: 16px 30px; border-radius: 40px; font-size: 16px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,122,255,0.3); cursor: pointer; width: 85%; max-width: 350px; transition: transform 0.1s; backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; gap: 8px; }
-        #generateBtn:active { transform: scale(0.96); }
-        .btn-hint { font-size: 12px; color: #999; margin-top: 8px; text-shadow: 0 1px 2px white; background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 4px;}
         
-        /* 微信遮罩 (强制显示) */
+        #generateBtn { 
+            pointer-events: auto; 
+            background-color: #ffffff; /* 按钮改为白色 */
+            color: var(--primary-color); /* 文字改为蓝色 */
+            border: none; 
+            padding: 16px 30px; 
+            border-radius: 40px; 
+            font-size: 17px; 
+            font-weight: 700; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25); /* 加深阴影 */
+            cursor: pointer; 
+            width: 85%; 
+            max-width: 350px; 
+            transition: transform 0.1s; 
+            display: flex; align-items: center; justify-content: center; gap: 8px; 
+        }
+        #generateBtn:active { transform: scale(0.96); }
+        
+        /* 提示小字改为半透明白底 */
+        .btn-hint { font-size: 12px; color: #555; margin-top: 10px; text-shadow: none; background: rgba(255,255,255,0.9); padding: 4px 12px; border-radius: 20px; font-weight: 500;}
+        
+        /* 微信遮罩 */
         #wx-mask { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; z-index: 99999; color: white; padding: 40px 20px; text-align: center; }
         .mask-content { text-align: right; margin-right: 20px; margin-top: 20px;}
-        .mask-arrow { font-size: 50px; animation: bounce 1.5s infinite; color: #007AFF; display: inline-block; margin-bottom: 10px;}
+        .mask-arrow { font-size: 50px; animation: bounce 1.5s infinite; color: #4db8ff; display: inline-block; margin-bottom: 10px;}
         .mask-text { font-size: 20px; font-weight: bold; margin-top: 10px; line-height: 1.5; }
         .mask-sub { font-size: 14px; color: #ccc; margin-top: 15px; font-weight: normal; line-height: 1.5; border-top: 1px solid #333; padding-top: 15px;}
-        
         @keyframes bounce { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(10px, -10px); } }
     </style>
 </head>
 <body>
 
-    <!-- 微信强力拦截遮罩 -->
+    <!-- 微信拦截遮罩 -->
     <div id="wx-mask">
         <div class="mask-content">
             <div class="mask-arrow">↗</div>
@@ -58,15 +138,27 @@
         </div>
     </div>
 
-    <!-- 主界面容器 -->
+    <!-- 主界面 -->
     <div id="main-content">
-        <h1>Conference Agenda · Hong Kong</h1>
-        <p class="subtitle">2025/12/16 (Tuesday)</p>
-
-        <div id="session-list">
-            <!-- JS 自动生成 -->
+        <!-- 标题区域 -->
+        <div class="header-area">
+            <!-- 1. 顶部 Tencent -->
+            <div class="brand-title">Tencent</div>
+            
+            <!-- 2. 会议标题 -->
+            <h1>Workshop on Neural Graphics & Generative AI</h1>
+            
+            <!-- 3. 日期 -->
+            <p class="subtitle">2025/12/16 (Tuesday) | Hong Kong</p>
         </div>
 
+        <!-- 4. 新增引导语 -->
+        <div class="instruction-text">Please select the talks you are interested in:</div>
+
+        <!-- 列表容器 -->
+        <div id="session-list"></div>
+
+        <!-- 按钮区域 -->
         <div class="btn-container">
             <button id="generateBtn" onclick="downloadICS()">
                 <span style="font-size: 20px">📅</span> Add to Calendar
@@ -76,21 +168,12 @@
     </div>
 
 <script>
-    // ================= 1. 立即执行：微信拦截 =================
-    // 放在代码最前面，确保一加载就拦截，不给用户操作机会
-    (function checkWeChat() {
-        var ua = navigator.userAgent.toLowerCase();
-        if (ua.match(/MicroMessenger/i) == "micromessenger") {
-            // 显示遮罩
-            document.getElementById('wx-mask').style.display = 'block';
-            // 隐藏主内容，防止用户试图操作
-            document.getElementById('main-content').style.display = 'none';
-        }
-    })();
+    // ================= 配置区域 =================
+    const CONFIG = {
+        date: "2025/12/16" // 锁定日期
+    };
 
-    // ================= 2. 配置区域 =================
-    const CONFERENCE_DATE = '2025/12/16'; 
-
+    // ================= 议程数据 =================
     const rawData = [
         { time: "09:30 - 10:00", title: "Breakfast", speaker: "", company: "" },
         { time: "10:00 - 10:15", title: "Opening Session", speaker: "Ying Shan", company: "Tencent ARC Lab" },
@@ -105,7 +188,21 @@
         { time: "16:30 - 17:00", title: "Panel Session", speaker: "Host：Yuan Liu", company: "Assistant Professor, Hong Kong University of Science and Technology" }
     ];
 
-    // ================= 3. 逻辑处理 =================
+    // ================= 逻辑代码 (环境检测 + ICS生成) =================
+    
+    // 立即执行环境检测
+    (function checkEnvironment() {
+        var ua = navigator.userAgent.toLowerCase();
+        var isWeChat = ua.match(/micromessenger/i) == "micromessenger";
+        
+        if (isWeChat) {
+            document.getElementById('wx-mask').style.display = 'block';
+        } else {
+            var main = document.getElementById('main-content');
+            main.style.display = 'block';
+            setTimeout(function() { main.style.opacity = '1'; }, 50);
+        }
+    })();
 
     const sessions = [];
     rawData.forEach((item, index) => {
@@ -122,7 +219,6 @@
     });
 
     const listContainer = document.getElementById('session-list');
-    
     sessions.forEach(session => {
         let speakerHtml = session.speaker ? `<p class="speaker">${session.speaker}</p>` : '';
         let companyHtml = session.company ? `<p class="affiliation">${session.company}</p>` : '';
@@ -159,27 +255,22 @@
         }
     }
 
-    // 下载 ICS 核心逻辑
     function downloadICS() {
         const ua = navigator.userAgent.toLowerCase();
         const isAndroid = ua.indexOf('android') > -1;
 
-        // 1. 验证选择
         const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
         if (checkboxes.length === 0) {
-            alert("Please select at least one session.\n请至少选择一个议程。");
+            alert("Please select at least one session.");
             return;
         }
 
-        // 2. 安卓用户的确认弹窗 (优化体验)
-        // 虽然不能直接写入，但通过 confirm 模拟 "系统询问" 的感觉
         if (isAndroid) {
-            const confirmed = confirm(`Add ${checkboxes.length} sessions to your calendar?\n\n是否将 ${checkboxes.length} 个议程加入日历？`);
-            if (!confirmed) return; // 用户点取消，则不下载
+            const confirmed = confirm(`Add ${checkboxes.length} sessions to your calendar?`);
+            if (!confirmed) return;
         }
 
-        // 3. 准备 ICS 数据
-        const dateParts = CONFERENCE_DATE.split('/');
+        const dateParts = CONFIG.date.split('/');
         const year = dateParts[0];
         const month = dateParts[1].padStart(2, '0');
         const day = dateParts[2].padStart(2, '0');
@@ -210,6 +301,8 @@
                 let description = "";
                 if (session.speaker) description += `Speaker: ${session.speaker}\\n`;
                 if (session.company) description += `Affiliation: ${session.company}`;
+                
+                // 标题处理：如果不是Host，把名字加上去
                 let summary = session.title;
                 if (session.speaker && !session.speaker.includes('Host')) {
                      summary = `${session.title} - ${session.speaker.split('、')[0]}`; 
@@ -229,22 +322,20 @@
 
         icsContent.push("END:VCALENDAR");
 
-        // 4. 生成并下载
         const fileContent = icsContent.join("\r\n");
         const blob = new Blob([fileContent], { type: 'text/calendar;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'HK_Conference.ics');
+        link.setAttribute('download', 'Tencent_Workshop.ics');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
-        // 5. 安卓下载后提示 (因为技术限制无法自动打开)
         if (isAndroid) {
             setTimeout(() => {
-                alert("File downloaded.\nPlease OPEN it from notification bar to save.\n\n文件已下载。\n请下拉通知栏打开文件以完成保存。");
+                alert("File downloaded.\nPlease OPEN it from notification bar to save.");
             }, 500);
         }
     }
