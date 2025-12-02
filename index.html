@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>会议日程助手 - 香港站</title>
+    <title>Conference Agenda - Hong Kong</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; background: #f2f2f7; padding: 20px; max-width: 600px; margin: 0 auto; padding-bottom: 120px; -webkit-tap-highlight-color: transparent; }
-        h1 { text-align: center; color: #1d1d1f; font-size: 22px; margin-bottom: 10px; font-weight: 700; letter-spacing: -0.5px; }
-        .subtitle { text-align: center; color: #86868b; font-size: 14px; margin-bottom: 25px; }
+        h1 { text-align: center; color: #1d1d1f; font-size: 22px; margin-bottom: 5px; font-weight: 700; }
+        .subtitle { text-align: center; color: #86868b; font-size: 14px; margin-bottom: 25px; margin-top: 5px; }
         
         .card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; align-items: flex-start; transition: all 0.2s ease; border: 1px solid rgba(0,0,0,0); }
         .card:active { transform: scale(0.98); background: #fcfcfc; }
-        
-        /* 选中态样式 */
         .card.selected { border: 1px solid #007AFF; background: #f0f7ff; }
 
         .checkbox-wrapper { margin-right: 16px; padding-top: 4px; display: flex; align-items: center; }
@@ -24,20 +22,25 @@
         .speaker { color: #1d1d1f; font-weight: 500; font-size: 14px; margin: 4px 0 2px 0; }
         .affiliation { color: #86868b; font-size: 12px; line-height: 1.3; }
 
-        .btn-container { position: fixed; bottom: 30px; left: 0; right: 0; display: flex; justify-content: center; z-index: 100; pointer-events: none; }
+        .btn-container { position: fixed; bottom: 30px; left: 0; right: 0; display: flex; justify-content: center; z-index: 100; pointer-events: none; flex-direction: column; align-items: center;}
         #generateBtn { pointer-events: auto; background-color: #007AFF; color: white; border: none; padding: 16px 30px; border-radius: 40px; font-size: 16px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,122,255,0.3); cursor: pointer; width: 85%; max-width: 350px; transition: transform 0.1s; backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; gap: 8px; }
         #generateBtn:active { transform: scale(0.96); }
+        .btn-hint { font-size: 12px; color: #999; margin-top: 8px; text-shadow: 0 1px 2px white; background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 4px;}
         
-        /* 微信遮罩 */
-        #wx-mask { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; color: white; text-align: right; padding-top: 50px; padding-right: 30px; backdrop-filter: blur(4px); }
-        .arrow-icon { font-size: 40px; animation: bounce 1.5s infinite; display: inline-block; margin-bottom: 10px;}
+        /* 优化的微信遮罩 */
+        #wx-mask { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; color: white; padding: 40px 20px; text-align: center; backdrop-filter: blur(5px); }
+        .mask-content { text-align: right; margin-right: 20px; margin-top: 20px;}
+        .mask-arrow { font-size: 50px; animation: bounce 1.5s infinite; color: #007AFF; display: inline-block; margin-bottom: 10px;}
+        .mask-text { font-size: 20px; font-weight: bold; margin-top: 10px; line-height: 1.5; }
+        .mask-sub { font-size: 14px; color: #ccc; margin-top: 15px; font-weight: normal; line-height: 1.5; border-top: 1px solid #333; padding-top: 15px;}
+        
         @keyframes bounce { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(10px, -10px); } }
     </style>
 </head>
 <body>
 
-    <h1>会议日程 · 香港站</h1>
-    <p class="subtitle">2025年12月16日 (Tuesday)</p>
+    <h1>Conference Agenda · Hong Kong</h1>
+    <p class="subtitle">2025/12/16 (Tuesday)</p>
 
     <div id="session-list">
         <!-- JS 自动生成 -->
@@ -45,30 +48,31 @@
 
     <div class="btn-container">
         <button id="generateBtn" onclick="downloadICS()">
-            <span style="font-size: 20px">📅</span> 添加到日历
+            <span style="font-size: 20px">📅</span> Add to Calendar
         </button>
+        <div class="btn-hint" id="btnHint">Auto-detect timezone: Hong Kong (GMT+8)</div>
     </div>
 
-    <!-- 微信引导遮罩 -->
+    <!-- 微信引导遮罩 (双语版) -->
     <div id="wx-mask" onclick="this.style.display='none'">
-        <div class="arrow-icon">↗</div>
-        <div style="font-size: 18px; font-weight: bold; line-height: 1.6;">
-            <p>点击右上角菜单 ···</p>
-            <p>选择 <span style="color: #4db8ff; border-bottom: 2px solid #4db8ff;">在浏览器打开</span></p>
+        <div class="mask-content">
+            <div class="mask-arrow">↗</div>
+            <div class="mask-text">
+                Please open in Browser<br>
+                <span style="font-size: 16px">请点击右上角，选择“在浏览器打开”</span>
+            </div>
+            <div class="mask-sub">
+                WeChat does not support calendar import directly.<br>
+                Please use Safari or Chrome.<br><br>
+                微信不支持直接导入日历文件，请跳转浏览器使用。
+            </div>
         </div>
-        <p style="font-size: 13px; color: #ccc; margin-top: 40px; text-align: center; width: 100%;">
-            微信内核无法直接导入日历文件<br>请跳转至 Safari 或 Chrome
-        </p>
     </div>
 
 <script>
     // ================= 配置区域 =================
-    
-    // 👇 会议日期设置 (格式: YYYY/MM/DD)
-    // 根据您的要求，设置为12月16日。年份暂定2025，如是2024请自行修改
     const CONFERENCE_DATE = '2025/12/16'; 
 
-    // 原始议程数据 (保持不变)
     const rawData = [
         { time: "09:30 - 10:00", title: "Breakfast", speaker: "", company: "" },
         { time: "10:00 - 10:15", title: "Opening Session", speaker: "Ying Shan", company: "Tencent ARC Lab" },
@@ -83,29 +87,24 @@
         { time: "16:30 - 17:00", title: "Panel Session", speaker: "Host：Yuan Liu", company: "Assistant Professor, Hong Kong University of Science and Technology" }
     ];
 
-    // ================= 逻辑处理区域 =================
+    // ================= 逻辑处理 =================
 
     const sessions = [];
-    
-    // 解析数据
     rawData.forEach((item, index) => {
         const times = item.time.split('-').map(t => t.trim());
-        // 为了确保跨时区正常工作，这里我们只解析小时和分钟字符串
-        // 不生成 Date 对象进行计算，而是直接操作时间字符串
         sessions.push({
             id: index,
             title: item.title,
             speaker: item.speaker,
             company: item.company,
-            startTimeStr: times[0], // "09:30"
-            endTimeStr: times[1],   // "10:00"
+            startTimeStr: times[0],
+            endTimeStr: times[1],
             displayTime: item.time
         });
     });
 
     const listContainer = document.getElementById('session-list');
     
-    // 渲染列表
     sessions.forEach(session => {
         let speakerHtml = session.speaker ? `<p class="speaker">${session.speaker}</p>` : '';
         let companyHtml = session.company ? `<p class="affiliation">${session.company}</p>` : '';
@@ -142,28 +141,28 @@
         }
     }
 
-    // 生成 ICS 核心逻辑
     function downloadICS() {
-        // 微信检测
         const ua = navigator.userAgent.toLowerCase();
+        
+        // 1. 微信环境检测
         if (ua.match(/MicroMessenger/i) == "micromessenger") {
             document.getElementById('wx-mask').style.display = 'block';
             return;
         }
 
+        // 2. 验证选择
         const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
         if (checkboxes.length === 0) {
-            alert("请至少选择一个议程");
+            alert("Please select at least one session.\n请至少选择一个议程。");
             return;
         }
 
-        // 解析日期字符串为 YYYYMMDD 格式
+        // 3. 准备 ICS 数据
         const dateParts = CONFERENCE_DATE.split('/');
-        // 补全月份和日期为两位数
         const year = dateParts[0];
         const month = dateParts[1].padStart(2, '0');
         const day = dateParts[2].padStart(2, '0');
-        const dateString = `${year}${month}${day}`; // e.g., 20251216
+        const dateString = `${year}${month}${day}`;
 
         let icsContent = [
             "BEGIN:VCALENDAR",
@@ -171,7 +170,6 @@
             "PRODID:-//TencentConferenceHK//CN",
             "CALSCALE:GREGORIAN",
             "METHOD:PUBLISH",
-            // 定义香港时区，兼容性更好
             "BEGIN:VTIMEZONE",
             "TZID:Asia/Hong_Kong",
             "BEGIN:STANDARD",
@@ -186,16 +184,11 @@
         checkboxes.forEach(box => {
             const session = sessions.find(s => s.id == box.value);
             if (session) {
-                // 构造时间格式: YYYYMMDDTHHmm00
-                // 去掉时间中的冒号 "09:30" -> "0930"
                 const startRaw = session.startTimeStr.replace(':', '') + '00';
                 const endRaw = session.endTimeStr.replace(':', '') + '00';
-
                 let description = "";
-                if (session.speaker) description += `演讲人: ${session.speaker}\\n`;
-                if (session.company) description += `单位: ${session.company}`;
-
-                // 标题优化
+                if (session.speaker) description += `Speaker: ${session.speaker}\\n`;
+                if (session.company) description += `Affiliation: ${session.company}`;
                 let summary = session.title;
                 if (session.speaker && !session.speaker.includes('Host')) {
                      summary = `${session.title} - ${session.speaker.split('、')[0]}`; 
@@ -204,34 +197,37 @@
                 icsContent.push("BEGIN:VEVENT");
                 icsContent.push(`UID:hk-conf-${session.id}-${Date.now()}@tencent.com`);
                 icsContent.push(`DTSTAMP:${getNowUTC()}`);
-                
-                // 关键：强制指定香港时区 (TZID=Asia/Hong_Kong)
-                // 这样无论用户手机是什么时区，日历都会显示为香港时间的 09:30
                 icsContent.push(`DTSTART;TZID=Asia/Hong_Kong:${dateString}T${startRaw}`);
                 icsContent.push(`DTEND;TZID=Asia/Hong_Kong:${dateString}T${endRaw}`);
-                
                 icsContent.push(`SUMMARY:${summary}`);
                 icsContent.push(`DESCRIPTION:${description}`);
-                icsContent.push(`LOCATION:Hong Kong`); // 可以修改为具体酒店/会场
+                icsContent.push(`LOCATION:Hong Kong`);
                 icsContent.push("END:VEVENT");
             }
         });
 
         icsContent.push("END:VCALENDAR");
 
+        // 4. 生成并下载
         const fileContent = icsContent.join("\r\n");
         const blob = new Blob([fileContent], { type: 'text/calendar;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'HK_Conference_Schedule.ics');
+        link.setAttribute('download', 'HK_Conference.ics');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+
+        // 5. 针对安卓的额外提示 (因为安卓不会自动弹出导入界面)
+        if (ua.indexOf('android') > -1) {
+            setTimeout(() => {
+                alert("📅 Download Started!\n\nPlease check your Notification Bar, tap the downloaded file 'HK_Conference.ics' to import.\n\n下载已开始！\n请下拉通知栏，点击下载的文件以导入日历。");
+            }, 800);
+        }
     }
 
-    // 获取当前 UTC 时间用于 DTSTAMP
     function getNowUTC() {
         const now = new Date();
         return now.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
