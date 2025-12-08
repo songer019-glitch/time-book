@@ -80,13 +80,39 @@
             border-radius: 6px;
         }
 
+        /* 列表头部工具栏 (包含引导语和全选按钮) */
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 25px 0 10px 0;
+            padding: 0 4px;
+        }
+
         /* 引导语 */
         .instruction-text {
             text-align: left;
             font-size: 13px;
             color: rgba(255,255,255, 0.7);
-            margin: 25px 0 10px 5px;
             font-weight: 400;
+            margin: 0;
+        }
+
+        /* 全选按钮样式 */
+        .select-all-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .select-all-btn:active {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0.95);
         }
         
         /* 卡片样式 */
@@ -172,8 +198,12 @@
             <div class="location-text">📍 Location: S224-225</div>
         </div>
 
-        <!-- 引导语 -->
-        <div class="instruction-text">Please select the talks you are interested in:</div>
+        <!-- 列表头部：引导语 + 全选按钮 -->
+        <div class="list-header">
+            <div class="instruction-text">Please select sessions:</div>
+            <!-- 默认初始状态为 Deselect All (因为默认全选了) -->
+            <button id="selectAllBtn" class="select-all-btn" onclick="toggleSelectAll()">Deselect All</button>
+        </div>
 
         <!-- 列表容器 -->
         <div id="session-list"></div>
@@ -195,9 +225,8 @@
     };
 
     // ================= 议程数据 =================
-    // ⚠️ 更新：删除了 Breakfast，修改了 Panel Session 时间
     const rawData = [
-        { time: "10:00 - 10:15", title: "Opening Session", speaker: "Ying Shan", company: "Tencent ARC Lab" },
+        { time: "10:00 - 10:15", title: "Opening Session", speaker: "Ying Shan", company: "Distinguished Scientist at Tencent, Director of ARC Lab" },
         { time: "10:15 - 10:45", title: "Towards 3D-aware Video World Models", speaker: "Wenbo Hu", company: "Tencent ARC Lab" },
         { time: "10:45 - 11:15", title: "A Human-Centered Approach to Multimodal Consistent Video Generation: Models and Practical Deployments", speaker: "Tianxiang Zheng", company: "Tencent Hunyuan" },
         { time: "11:15 - 11:45", title: "GameCraft-2: Instruction-Following Interactive Game Video Generation", speaker: "Junshu Tang", company: "Tencent Hunyuan" },
@@ -244,10 +273,11 @@
         let speakerHtml = session.speaker ? `<p class="speaker">${session.speaker}</p>` : '';
         let companyHtml = session.company ? `<p class="affiliation">${session.company}</p>` : '';
 
+        // ⚠️ 更新：默认添加 'selected' 类 和 'checked' 属性
         const html = `
-            <div class="card" id="card-${session.id}" onclick="toggleCheck('${session.id}')">
+            <div class="card selected" id="card-${session.id}" onclick="toggleCheck('${session.id}')">
                 <div class="checkbox-wrapper">
-                    <input type="checkbox" id="sess-${session.id}" value="${session.id}" onclick="event.stopPropagation(); updateCardStyle('${session.id}')">
+                    <input type="checkbox" id="sess-${session.id}" value="${session.id}" onclick="event.stopPropagation(); updateCardStyle('${session.id}')" checked>
                 </div>
                 <div class="info">
                     <span class="time-tag">${session.displayTime}</span>
@@ -266,6 +296,7 @@
         updateCardStyle(id);
     }
 
+    // 更新卡片选中样式
     function updateCardStyle(id) {
         const checkbox = document.getElementById(`sess-${id}`);
         const card = document.getElementById(`card-${id}`);
@@ -274,6 +305,36 @@
         } else {
             card.classList.remove('selected');
         }
+        
+        // 检查是否全部选中，更新按钮文字
+        updateSelectAllBtnState();
+    }
+
+    // 全选/反选逻辑
+    function toggleSelectAll() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        const btn = document.getElementById('selectAllBtn');
+        
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        const newState = !allChecked;
+
+        checkboxes.forEach(cb => {
+            cb.checked = newState;
+            // 手动调用 updateCardStyle 里的逻辑，但不触发 updateSelectAllBtnState 以免重复计算
+            const card = document.getElementById(`card-${cb.value}`);
+            if (newState) card.classList.add('selected');
+            else card.classList.remove('selected');
+        });
+
+        btn.innerText = newState ? "Deselect All" : "Select All";
+    }
+
+    // 辅助函数：根据当前勾选状态，自动更新全选按钮的文字
+    function updateSelectAllBtnState() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        const btn = document.getElementById('selectAllBtn');
+        btn.innerText = allChecked ? "Deselect All" : "Select All";
     }
 
     function downloadICS() {
